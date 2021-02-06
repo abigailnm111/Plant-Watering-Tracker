@@ -77,7 +77,7 @@ def add_water_day(name, location, last_watered_date, water_days, service):
         
         }
     #converts to json string and then json object. API won't correctly read json as string
-    water_day= json.dumps(water_day,default=lambda o:o.__dict__)#     <**research what this actually means**
+    water_day= json.dumps(water_day,default=lambda o:o.__dict__)#     
     json_wd=json.loads(water_day)
     #uses API calendar to add to user's calendar using event info above after converted to json readable
     watering_event= service.events().insert(calendarId='primary', body=json_wd).execute()
