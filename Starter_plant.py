@@ -11,19 +11,25 @@ Created on Mon Jan 18 21:02:33 2021
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 
+"""other libraries"""
 from datetime import datetime, timedelta
-
 import json
 
+"""my methods"""
 #my sq file
-import sqlite
-
+#import sqlite
 
 
 #credentials, 'plant-water-tracking' = google.auth.default(scopes='https://www.googleapis.com/auth/calendar', )
 service= build('calendar', "v3")
 
+class error(Exception):
+    """base error"""
+    pass
 
+class invalid_menu_entry(error):
+    """input not a valid menu option """
+    pass
 
 class plants():
     def __init__ (self, name, location, last_watered, water_frequency):
@@ -91,11 +97,23 @@ def check_input(prompt, condition, typ, except_message):
             return response
         except:
             print(except_message)
+            
+def menu_selection_validation(prompt,allowable_responses):
+    while True:
+        response= input(prompt)
+        try:
+            if response in allowable_responses:
+                return response
+            else:
+                raise invalid_menu_entry
+            
+        except invalid_menu_entry:
+            print ("Enter a valid manu slection:{}".format(allowable_responses))
         
 def main():
     #creaes dictionary to add plant data
     plant_index={}
-    enter_plants=str(input("do you have some plant children that need to be watered? Y or N"))
+    enter_plants= menu_selection_validation("do you have some plant children that need to be watered? Y or N",['y', 'Y', 'n', 'N'])
     index_number=0
    
     if enter_plants== "y" or enter_plants =="Y":
@@ -113,7 +131,7 @@ def main():
                                               int, "Try entering a numeral equal to or higher then 1 for the number of days between watering")
             plants(plant_name, plant_location, plant_last_watered, plant_water_frequency)
             plant_index[index_number]= {'name':plant_name, 'location':plant_location, 'last_watered' :str(plant_last_watered), 'frequency(days)':plant_water_frequency}
-            add_plant=str(input("do you have more plants to add? Y or N"))
+            add_plant=menu_selection_validation("do you have more plants to add? Y or N",['y', 'Y', 'n', 'N'])
             
             #calls account authorization
             
