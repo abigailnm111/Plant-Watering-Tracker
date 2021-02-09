@@ -50,10 +50,6 @@ def oauth():
 def add_water_day(name, location, last_watered_date, water_days, service):
     #name of even includes plant's name
     event_summary= ('water {}'. format (name)) 
-    print(name)
-    print(location)
-    print (last_watered_date)
-    print (water_days)
     #takes last day watered and adds the number of days from frequency to determine
     #date for next watering event. Converts to date only and then to string to make JSON compatiable
     
@@ -80,8 +76,8 @@ def add_water_day(name, location, last_watered_date, water_days, service):
     water_day= json.dumps(water_day,default=lambda o:o.__dict__)     
     json_wd=json.loads(water_day)
     #uses API calendar to add to user's calendar using event info above after converted to json readable
-    watering_event= service.events().insert(calendarId='primary', body=json_wd).execute()
-    return watering_event
+    service.events().insert(calendarId='primary', body=json_wd).execute()
+    return event_summary
 
 #check if user inputed date is valid:
     #1. date should be in correct format.
@@ -143,20 +139,20 @@ def main():
                  service=oauth()
                  #iterates through dictionary to make events for each plant
                  #for plant_info in plant_index.values():   
+                 index=1
                  for plant in plant_index:
-                    index=1
+                    
                     plant_info=plant_index[index]
-                    print (plant_index)
-                    print (plant_info)
-                    sqlite.cursor.executemany('''INSERT INTO plant_data 
-                                              (name, location, last_watered, water_frequency) VALUES 
-                                              (:name, :location, :last_watered, :frequency(days))''', 
-                                              (plant_info,)
-                                              )    
+                    
+                    #sqlite.cursor.executemany('''INSERT INTO plant_data 
+                                              # (name, location, last_watered, water_frequency) VALUES 
+                                              # (:name, :location, :last_watered, :frequency(days))''', 
+                                              # (plant_info,)
+                                              # )    
                     index+=1
                     print("added to dictionary")
-                    add_water_day(*plant_info.values(), service)
-  
+                    event_added=add_water_day(*plant_info.values(), service)
+                    print ("'{}' has been added to your calendar" .format (event_added))
     else:
         print ("you should go get some plants and come back!")
        
