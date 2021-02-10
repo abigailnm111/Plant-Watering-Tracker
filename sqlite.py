@@ -46,6 +46,7 @@ def column_selection(col_id):
     else:
         column= 'water_frequency'
     return column
+
 def main ():
     print_plant_data()
     plant_id= int(input("what plant would you like to update?(enter the ID number)"))
@@ -55,5 +56,3 @@ def main ():
     update_plant( column,plant_id,update_item)
     connection.commit()
     print_plant_data()
-
-main()

@@ -17,7 +17,7 @@ import json
 
 """my methods"""
 #my sq file
-#import sqlite
+import sqlite
 
 
 #credentials, 'plant-water-tracking' = google.auth.default(scopes='https://www.googleapis.com/auth/calendar', )
@@ -32,12 +32,19 @@ class invalid_menu_entry(error):
     pass
 
 class plants():
+    plant_id=1
+    plant_index={}
     def __init__ (self, name, location, last_watered, water_frequency):
         
+        self.plant_id=plants.plant_id
         self.name=name
         self.location=location
         self.last_watered=last_watered
-        self.water_frequency= water_frequency
+        self.water_frequency= water_frequency    
+        
+    def plant_dict(self):
+        plants.plant_index[plants.plant_id]= {'name':self.name, 'location':self.location, 'last_watered' :self.last_watered, 'frequency(days)':self.water_frequency}
+        plants.plant_id+=1
         
     #Request authorization to add/edit events to user's priamary Google Calendar
 def oauth():
@@ -108,14 +115,11 @@ def menu_selection_validation(prompt,allowable_responses):
         
 def main():
     #creaes dictionary to add plant data
-    plant_index={}
     enter_plants= menu_selection_validation("do you have some plant children that need to be watered? Y or N",['y', 'Y', 'n', 'N'])
-    index_number=0
    
     if enter_plants== "y" or enter_plants =="Y":
         add_plant="Y"
         while (add_plant=="y" or add_plant=="Y"):
-            index_number+=1
             plant_name=input("what is your plant's name?")
             plant_location= input("where is your plant?")
             #Get input and check for valid date at the same time. Won't continue until valid date entered
@@ -125,8 +129,8 @@ def main():
            
             plant_water_frequency=check_input("how often (in days) do you water your plant?", lambda r: r>=1,\
                                               int, "Try entering a numeral equal to or higher then 1 for the number of days between watering")
-            plants(plant_name, plant_location, plant_last_watered, plant_water_frequency)
-            plant_index[index_number]= {'name':plant_name, 'location':plant_location, 'last_watered' :str(plant_last_watered), 'frequency(days)':plant_water_frequency}
+            plant_entry= plants(plant_name, plant_location, plant_last_watered, plant_water_frequency)
+            plant_entry.plant_dict()
             add_plant=menu_selection_validation("do you have more plants to add? Y or N",['y', 'Y', 'n', 'N'])
             
             #calls account authorization
@@ -139,19 +143,17 @@ def main():
                  service=oauth()
                  #iterates through dictionary to make events for each plant
                  #for plant_info in plant_index.values():   
-                 index=1
-                 for plant in plant_index:
+                 
+                 for plant in plants.plant_index:
                     
-                    plant_info=plant_index[index]
+                    sqlite.cursor.executemany('''INSERT INTO plant_data 
+                                               (name, location, last_watered, water_frequency) VALUES 
+                                               (:name, :location, :last_watered, :frequency(days))''', 
+                                               (plants.plant_index[plant],)
+                                               )    
                     
-                    #sqlite.cursor.executemany('''INSERT INTO plant_data 
-                                              # (name, location, last_watered, water_frequency) VALUES 
-                                              # (:name, :location, :last_watered, :frequency(days))''', 
-                                              # (plant_info,)
-                                              # )    
-                    index+=1
                     print("added to dictionary")
-                    event_added=add_water_day(*plant_info.values(), service)
+                    event_added=add_water_day(*plants.plant_index[plant].values(), service)
                     print ("'{}' has been added to your calendar" .format (event_added))
     else:
         print ("you should go get some plants and come back!")
