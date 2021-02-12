@@ -7,7 +7,7 @@ Created on Mon Jan 18 21:02:33 2021
 
 """
 #setting up OAuth2
-#import google.oauth2.credentials
+
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 
@@ -57,14 +57,14 @@ def oauth():
 def add_water_day(name, location, last_watered_date, water_days, service):
     #name of even includes plant's name
     event_summary= ('water {}'. format (name)) 
-    #takes last day watered and adds the number of days from frequency to determine
-    #date for next watering event. Converts to date only and then to string to make JSON compatiable
+     #takes last day watered and adds the number of days from frequency to determine
+     #date for next watering event. Converts to date only and then to string to make JSON compatiable
     
     plant_last_watered= datetime.strptime(last_watered_date,'%Y-%m-%d')
     water_date=str(datetime.date(plant_last_watered+timedelta(days= water_days)))  
     #creates reoccuring events based on number of days between watering
     frequency='RRULE:FREQ=DAILY;INTERVAL={};COUNT=10'. format (water_days)
-    #event information for API calendar
+#     #event information for API calendar
     water_day={
         'summary': event_summary,
         'location': location,
@@ -79,7 +79,7 @@ def add_water_day(name, location, last_watered_date, water_days, service):
         'recurrence': [frequency,]
         
         }
-    #converts to json string and then json object. API won't correctly read json as string
+#     #converts to json string and then json object. API won't correctly read json as string
     water_day= json.dumps(water_day,default=lambda o:o.__dict__)     
     json_wd=json.loads(water_day)
     #uses API calendar to add to user's calendar using event info above after converted to json readable
@@ -142,17 +142,10 @@ def main():
                  print("Lets add your watering schdule to your Google calendar!")
                  service=oauth()
                  #iterates through dictionary to make events for each plant
-                 #for plant_info in plant_index.values():   
                  
+                 sqlite.plant_db.add_to_database(plants.plant_index)
                  for plant in plants.plant_index:
-                    
-                    sqlite.cursor.executemany('''INSERT INTO plant_data 
-                                               (name, location, last_watered, water_frequency) VALUES 
-                                               (:name, :location, :last_watered, :frequency(days))''', 
-                                               (plants.plant_index[plant],)
-                                               )    
-                    
-                    print("added to dictionary")
+                
                     event_added=add_water_day(*plants.plant_index[plant].values(), service)
                     print ("'{}' has been added to your calendar" .format (event_added))
     else:
