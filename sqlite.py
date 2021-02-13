@@ -30,6 +30,7 @@ class plant_db():
         plant_db.connection.commit()  
         
     def add_to_database(plant_input):
+        
         index=1
         plant_db.open_plant_db()
         for plant in plant_input:
@@ -50,20 +51,75 @@ class plant_db():
         
         plant_db.connection.close()
  
-class login_db():
-
-    def open_login_db():
-        connection=sqlite3.connectt('login.db')
+class login_db:
+    
+        connection=sqlite3.connect('login.db')
         cursor= connection.cursor()
-        cursor.execute('''
-                       CREATE TABLE IS NOT EXISTS login_ids(
-                           username TEXT,
-                           password TEXT
-                           
-                           )
+        def __init__(self, *logon):
+            self.UN=logon[0]
+            self.PW=logon[1]
+        def open_login_db():
+            login_db.cursor.execute('''
+                           CREATE TABLE IF NOT EXISTS login_ids(
+                               username TEXT,
+                               password TEXT
+                               
+                               )
+                
+                            ''')
+            login_db.connection.commit()
+            print ("database connected")
             
-                        ''')
-
+        def create_login_id(self):
+            
+            login_db.cursor.execute('''INSERT INTO login_ids
+                                    (username, password ) VALUES
+                                     (?, ?)''', (self.UN, self.PW,)
+                                    
+                                    
+                                    )
+            login_db.connection.commit()
+            print("login id added")
+        def user_login(self):
+           login_db.cursor.execute('''SELECT *
+                                    FROM login_ids
+                                    WHERE username= ? and password = ?
+                                    
+                                    ''', (self.UN, self.PW) )
+           UN_valid= login_db.cursor.fetchall()
+           print (UN_valid)
+           if UN_valid != []: 
+               return True
+           else:
+                return False
+            
+            
+#integrate into main file and add validation           
+def main():
+    menu=input ('do you already have an account?')
+    if menu == 'y' or menu== "Y":
+        UN_attempt= input ('enter your username')
+        PW_attempt= input ('enter your password')
+        user=login_db(UN_attempt, PW_attempt)
+        login_db.open_login_db()
+        validate=user.user_login()
+        print (validate)
+        if validate== True:
+               print ("valid login id")
+        else:
+               print ("faild login id")
+        
+    elif menu == 'n' or menu == "N":   
+           create_UN= input ('enter username')
+           ''' add validation to check if username exists'''
+           create_PW= input ('enter password')
+           user=login_db(create_UN, create_PW)
+           login_db.open_login_db()
+           user.create_login_id()
+           
+ 
+       
+main()       
              
 # def print_plant_data():
 #     cursor.execute("SELECT rowid, * FROM plant_data")
