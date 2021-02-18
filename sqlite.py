@@ -119,7 +119,7 @@ def main():
            
  
        
-main()       
+      
              
 # def print_plant_data():
 #     cursor.execute("SELECT rowid, * FROM plant_data")

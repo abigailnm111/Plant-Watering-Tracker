@@ -18,6 +18,7 @@ import json
 """my methods"""
 #my sq file
 import sqlite
+import exceptions
 
 
 #credentials, 'plant-water-tracking' = google.auth.default(scopes='https://www.googleapis.com/auth/calendar', )
@@ -64,7 +65,7 @@ def add_water_day(name, location, last_watered_date, water_days, service):
     water_date=str(datetime.date(plant_last_watered+timedelta(days= water_days)))  
     #creates reoccuring events based on number of days between watering
     frequency='RRULE:FREQ=DAILY;INTERVAL={};COUNT=10'. format (water_days)
-#     #event information for API calendar
+    #event information for API calendar
     water_day={
         'summary': event_summary,
         'location': location,
@@ -79,27 +80,14 @@ def add_water_day(name, location, last_watered_date, water_days, service):
         'recurrence': [frequency,]
         
         }
-#     #converts to json string and then json object. API won't correctly read json as string
+    #converts to json string and then json object. API won't correctly read json as string
     water_day= json.dumps(water_day,default=lambda o:o.__dict__)     
     json_wd=json.loads(water_day)
     #uses API calendar to add to user's calendar using event info above after converted to json readable
     service.events().insert(calendarId='primary', body=json_wd).execute()
     return event_summary
 
-#check if user inputed date is valid:
-    #1. date should be in correct format.
-    #2. date should be actual date
-    #3 date should not be in the future                **needs**
-def check_input(prompt, condition, typ, except_message):
-    while True:
-        
-        try:
-            response=typ(input(prompt))
-            condition(response)
-            
-            return response
-        except:
-            print(except_message)
+
             
 def menu_selection_validation(prompt,allowable_responses):
     while True:
@@ -115,6 +103,7 @@ def menu_selection_validation(prompt,allowable_responses):
         
 def main():
     #creaes dictionary to add plant data
+    
     enter_plants= menu_selection_validation("do you have some plant children that need to be watered? Y or N",['y', 'Y', 'n', 'N'])
    
     if enter_plants== "y" or enter_plants =="Y":
@@ -122,13 +111,9 @@ def main():
         while (add_plant=="y" or add_plant=="Y"):
             plant_name=input("what is your plant's name?")
             plant_location= input("where is your plant?")
-            #Get input and check for valid date at the same time. Won't continue until valid date entered
-            plant_last_watered= check_input("when did you last water your plant?(yyyy-mm-dd)", \
-                                           lambda r: datetime.strptime(r, '%Y-%m-%d'), str,\
-                                                "Try enterting again in yyyy-mm-dd format." )
-           
-            plant_water_frequency=check_input("how often (in days) do you water your plant?", lambda r: r>=1,\
-                                              int, "Try entering a numeral equal to or higher then 1 for the number of days between watering")
+            #Get input and check for valid date at the same time. Won't continue until valid date entered   
+            plant_last_watered= exceptions.check_input(exceptions.date_error)
+            plant_water_frequency=exceptions.check_input(exceptions.days_error)
             plant_entry= plants(plant_name, plant_location, plant_last_watered, plant_water_frequency)
             plant_entry.plant_dict()
             add_plant=menu_selection_validation("do you have more plants to add? Y or N",['y', 'Y', 'n', 'N'])
