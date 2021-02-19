@@ -47,6 +47,55 @@ class plants():
         plants.plant_index[plants.plant_id]= {'name':self.name, 'location':self.location, 'last_watered' :self.last_watered, 'frequency(days)':self.water_frequency}
         plants.plant_id+=1
         
+    def add_plant():
+        add_plant='y'
+        while (add_plant=="y" or add_plant=="Y"):
+            plant_name=input("what is your plant's name?")
+            plant_location= input("where is your plant?")
+            #Get input and check for valid date at the same time. Won't continue until valid date entered   
+            plant_last_watered= exceptions.check_input(exceptions.date_error)
+            plant_water_frequency=exceptions.check_input(exceptions.days_error)
+            plant_entry= plants(plant_name, plant_location, plant_last_watered, plant_water_frequency)
+            plant_entry.plant_dict()
+            add_plant=input("do you have more plants to add? Y or N")
+            if add_plant== "n" or add_plant== "N":
+                  sqlite.plant_db.add_to_database(plants.plant_index)
+                 #calls account authorization
+                  print("Lets add your watering schdule to your Google calendar!")
+                  service=oauth()
+                 #iterates through dictionary to make events for each plant
+                  for plant in plants.plant_index:
+                     event_added=add_water_day(*plants.plant_index[plant].values(), service)
+                     print ("'{}' has been added to your calendar" .format (event_added))
+            
+    def update_plant():
+       update_plant='y'
+       while (update_plant== 'y' or update_plant== 'Y'): 
+           sqlite.plant_db.print_plant_data()
+           plant_id= int(input("what plant would you like to update?(enter the ID number)"))
+           column_id= int(input("which column would you like to change?"))
+           
+           column=sqlite.plant_db.column_selection(column_id)
+           update_item = input("Enter the updated information.")
+           sqlite.plant_db.update_plant( column,plant_id,update_item)
+           update_plant= input('Do you want to update another plant?')
+   
+def main_menu():   
+
+     menu_selec= input('would you like to \n 1) Add new plant \n 2) View your current plants \n 3) Update your plants \n 4) Exit')
+     if menu_selec=='1':
+         plants.add_plant()
+         main_menu()
+     if menu_selec=='2':
+         sqlite.plant_db.print_plant_data()
+         main_menu()
+     if menu_selec=='3':
+         plants.update_plant()
+         main_menu()
+     if menu_selec =='4':
+         sqlite.plant_db.connection.close()
+         print("take care of those plant babies!")
+        
     #Request authorization to add/edit events to user's priamary Google Calendar
 def oauth():
     
@@ -88,7 +137,7 @@ def add_water_day(name, location, last_watered_date, water_days, service):
     return event_summary
 
 
-            
+    ##### Not being used currently        
 def menu_selection_validation(prompt,allowable_responses):
     while True:
         response= input(prompt)
@@ -100,41 +149,15 @@ def menu_selection_validation(prompt,allowable_responses):
             
         except invalid_menu_entry:
             print ("Enter a valid manu slection:{}".format(allowable_responses))
+            
+
         
 def main():
-    #creaes dictionary to add plant data
     
-    enter_plants= menu_selection_validation("do you have some plant children that need to be watered? Y or N",['y', 'Y', 'n', 'N'])
-   
-    if enter_plants== "y" or enter_plants =="Y":
-        add_plant="Y"
-        while (add_plant=="y" or add_plant=="Y"):
-            plant_name=input("what is your plant's name?")
-            plant_location= input("where is your plant?")
-            #Get input and check for valid date at the same time. Won't continue until valid date entered   
-            plant_last_watered= exceptions.check_input(exceptions.date_error)
-            plant_water_frequency=exceptions.check_input(exceptions.days_error)
-            plant_entry= plants(plant_name, plant_location, plant_last_watered, plant_water_frequency)
-            plant_entry.plant_dict()
-            add_plant=menu_selection_validation("do you have more plants to add? Y or N",['y', 'Y', 'n', 'N'])
-            
-            #calls account authorization
-            
-            # calls function that adds event
-            
-            if add_plant== "n" or add_plant== "N":
-                 #calls account authorization
-                 print("Lets add your watering schdule to your Google calendar!")
-                 service=oauth()
-                 #iterates through dictionary to make events for each plant
-                 
-                 sqlite.plant_db.add_to_database(plants.plant_index)
-                 for plant in plants.plant_index:
-                
-                    event_added=add_water_day(*plants.plant_index[plant].values(), service)
-                    print ("'{}' has been added to your calendar" .format (event_added))
-    else:
-        print ("you should go get some plants and come back!")
+    
+    main_menu()
+    
+    
        
   
 
