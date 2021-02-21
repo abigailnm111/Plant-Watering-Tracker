@@ -22,8 +22,9 @@ class plant_db():
                     CREATE TABLE IF NOT EXISTS plant_data (
                     name TEXT, 
                     location TEXT, 
-                    last_watered TEXT,nw
-                    water_frequency INTEGER 
+                    last_watered TEXT, 
+                    water_frequency INTEGER, 
+                    event_id TEXT
                     )
                     ''')
                  
@@ -38,8 +39,8 @@ class plant_db():
             plant_info=plant_input[index]
             
             plant_db.cursor.executemany('''INSERT INTO plant_data 
-                                        (name, location, last_watered, water_frequency) VALUES 
-                                        (:name, :location, :last_watered, :frequency(days))''', 
+                                        (name, location, last_watered, water_frequency, event_id) VALUES 
+                                        (:name, :location, :last_watered, :frequency(days), :event_id)''', 
                                         (plant_info,)
                                         )    
             index+=1
@@ -58,6 +59,7 @@ class plant_db():
         print("     1.name       2.location        3.last watered on:        4.days between watering")
         for plant in readable_plants:
             print(plant)
+            
         
     def update_plant(column, row, change ):
         plant_db.open_plant_db()
@@ -67,6 +69,12 @@ class plant_db():
         plant_db.cursor.execute("SELECT * FROM plant_data")
         print ("Here are your updated plants")
         plant_db.print_plant_data()
+        
+    def get_event_id (row):
+        plant_db.open_plant_db()
+        plant_db.cursor.execute ("SELECT event_id FROM plant_data WHERE rowid = ?", (row,) )
+        event_id= plant_db.cursor.fetchone()
+        return event_id[0]
         
         
         
@@ -147,7 +155,6 @@ def main():
            login_db.open_login_db()
            user.create_login_id()
            
- 
- 
+
 
 """practice calling and updating database"""

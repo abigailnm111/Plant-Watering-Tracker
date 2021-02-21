@@ -31,10 +31,30 @@ class error(Exception):
 class invalid_menu_entry(error):
     """input not a valid menu option """
     pass
-
+def update_event(event_id,event_info, update_info):
+    service=oauth()
+    OGevent = service.events().get(calendarId='primary', eventId= event_id).execute()
+    OGevent[event_info]= update_info
+    service.events().update(calendarId='primary', eventId=event_id, body=OGevent).execute()
+    print ("you have updated your plant's watering schedule")
+    
+def column_event(column):
+    if column== 1:
+        event_info= 'summary'
+    if column == 2:
+        event_info= 'location'
+        ##work on/test these
+    if column== 3:
+        event_info= ('start', 'end')
+        
+    if column== 4:
+        event_info=='recurrence'
+    return event_info
+    
 class plants():
     plant_id=1
     plant_index={}
+   
     def __init__ (self, name, location, last_watered, water_frequency):
         
         self.plant_id=plants.plant_id
@@ -42,6 +62,8 @@ class plants():
         self.location=location
         self.last_watered=last_watered
         self.water_frequency= water_frequency    
+    #def add_event_id(self,event_id):
+       # self.event_id=event_id
         
     def plant_dict(self):
         plants.plant_index[plants.plant_id]= {'name':self.name, 'location':self.location, 'last_watered' :self.last_watered, 'frequency(days)':self.water_frequency}
@@ -59,14 +81,19 @@ class plants():
             plant_entry.plant_dict()
             add_plant=input("do you have more plants to add? Y or N")
             if add_plant== "n" or add_plant== "N":
-                  sqlite.plant_db.add_to_database(plants.plant_index)
+                  
                  #calls account authorization
                   print("Lets add your watering schdule to your Google calendar!")
                   service=oauth()
                  #iterates through dictionary to make events for each plant
                   for plant in plants.plant_index:
                      event_added=add_water_day(*plants.plant_index[plant].values(), service)
-                     print ("'{}' has been added to your calendar" .format (event_added))
+                     
+                     
+                     plants.plant_index[plant]['event_id']=event_added['id']
+                     print ("'{}' has been added to your calendar" .format (event_added['summary']))
+                     
+                  sqlite.plant_db.add_to_database(plants.plant_index)
             
     def update_plant():
        update_plant='y'
@@ -78,11 +105,15 @@ class plants():
            column=sqlite.plant_db.column_selection(column_id)
            update_item = input("Enter the updated information.")
            sqlite.plant_db.update_plant( column,plant_id,update_item)
+           event_id=sqlite.plant_db.get_event_id(plant_id)
+           print (event_id, type(event_id))
+           update_event(event_id, column, update_item)
+           print ("Your updates have been made to database and calendar")
            update_plant= input('Do you want to update another plant?')
    
 def main_menu():   
 
-     menu_selec= input('would you like to \n 1) Add new plant \n 2) View your current plants \n 3) Update your plants \n 4) Exit')
+     menu_selec= input('would you like to \n 1) Add new plant \n 2) View your current plants \n 3) Update your plants \n 4) Delete a plant \n 5) Exit')
      if menu_selec=='1':
          plants.add_plant()
          main_menu()
@@ -93,6 +124,8 @@ def main_menu():
          plants.update_plant()
          main_menu()
      if menu_selec =='4':
+         ##placeholder for delete option
+     if menu_selec== '5'
          sqlite.plant_db.connection.close()
          print("take care of those plant babies!")
         
@@ -133,8 +166,9 @@ def add_water_day(name, location, last_watered_date, water_days, service):
     water_day= json.dumps(water_day,default=lambda o:o.__dict__)     
     json_wd=json.loads(water_day)
     #uses API calendar to add to user's calendar using event info above after converted to json readable
-    service.events().insert(calendarId='primary', body=json_wd).execute()
-    return event_summary
+    plant_added= service.events().insert(calendarId='primary', body=json_wd).execute()
+   
+    return plant_added
 
 
     ##### Not being used currently        
