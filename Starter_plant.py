@@ -7,7 +7,7 @@ Created on Mon Jan 18 21:02:33 2021
 
 """
 #setting up OAuth2
-
+from googleapiclient import errors
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 
@@ -21,8 +21,8 @@ import sqlite
 import exceptions
 
 
-#credentials, 'plant-water-tracking' = google.auth.default(scopes='https://www.googleapis.com/auth/calendar', )
-service= build('calendar', "v3")
+
+
 
 class error(Exception):
     """base error"""
@@ -31,23 +31,30 @@ class error(Exception):
 class invalid_menu_entry(error):
     """input not a valid menu option """
     pass
-def update_event(event_id,event_info, update_info):
-    service=oauth()
+def update_event(event_id,event_info, update_info, service):
+    
     OGevent = service.events().get(calendarId='primary', eventId= event_id).execute()
     OGevent[event_info]= update_info
     service.events().update(calendarId='primary', eventId=event_id, body=OGevent).execute()
     print ("you have updated your plant's watering schedule")
     
+def delete_event(event_id,service):
+   try: 
+    service.events().delete(calendarId='primary', eventId=event_id).execute()
+   except errors.HttpError:
+        print("it looks like that event was already deleted.")
+        pass
+    
 def column_event(column):
-    if column== 1:
+    if column== '1':
         event_info= 'summary'
-    if column == 2:
+    if column == '2':
         event_info= 'location'
         ##work on/test these
-    if column== 3:
+    if column== '3':
         event_info= ('start', 'end')
         
-    if column== 4:
+    if column== '4':
         event_info=='recurrence'
     return event_info
     
@@ -69,7 +76,7 @@ class plants():
         plants.plant_index[plants.plant_id]= {'name':self.name, 'location':self.location, 'last_watered' :self.last_watered, 'frequency(days)':self.water_frequency}
         plants.plant_id+=1
         
-    def add_plant():
+    def add_plant(service):
         add_plant='y'
         while (add_plant=="y" or add_plant=="Y"):
             plant_name=input("what is your plant's name?")
@@ -79,12 +86,12 @@ class plants():
             plant_water_frequency=exceptions.check_input(exceptions.days_error)
             plant_entry= plants(plant_name, plant_location, plant_last_watered, plant_water_frequency)
             plant_entry.plant_dict()
-            add_plant=input("do you have more plants to add? Y or N")
+            add_plant=menu_selection_validation(str, "do you have more plants to add? Y or N",('y', 'Y', 'n', 'N') )
             if add_plant== "n" or add_plant== "N":
                   
                  #calls account authorization
                   print("Lets add your watering schdule to your Google calendar!")
-                  service=oauth()
+                 
                  #iterates through dictionary to make events for each plant
                   for plant in plants.plant_index:
                      event_added=add_water_day(*plants.plant_index[plant].values(), service)
@@ -95,37 +102,53 @@ class plants():
                      
                   sqlite.plant_db.add_to_database(plants.plant_index)
             
-    def update_plant():
+    def update_plant(service):
        update_plant='y'
        while (update_plant== 'y' or update_plant== 'Y'): 
            sqlite.plant_db.print_plant_data()
-           plant_id= int(input("what plant would you like to update?(enter the ID number)"))
-           column_id= int(input("which column would you like to change?"))
+           plant_id= menu_selection_validation(int,"what plant would you like to update?(enter the ID number)", sqlite.plant_db.get_db_column_info('rowid'))
+           column_id= menu_selection_validation(int,"which column would you like to change?", (1, 2, 3, 4))
            
            column=sqlite.plant_db.column_selection(column_id)
-           update_item = input("Enter the updated information.")
+           if column_id== 1 or column_id ==2:
+               update_item = input("Enter the updated information.")
+           if column_id == 3:
+               update_item= exceptions.check_input(exceptions.date_error)
+           if column_id == 4:
+               update_item = exceptions.check_input(exceptions.days_error)
            sqlite.plant_db.update_plant( column,plant_id,update_item)
            event_id=sqlite.plant_db.get_event_id(plant_id)
-           print (event_id, type(event_id))
-           update_event(event_id, column, update_item)
+           
+           update_event(event_id, column, update_item, service)
            print ("Your updates have been made to database and calendar")
-           update_plant= input('Do you want to update another plant?')
+           update_plant= menu_selection_validation(str,'Do you want to update another plant?', ('y', 'Y', 'n', 'N'))
+           
+    def delete_plant(service):
+        delete_plant='y'
+        while (delete_plant== 'y' or delete_plant== 'Y'): 
+           sqlite.plant_db.print_plant_data()
+           plant_id= menu_selection_validation(int,"what plant would you like to update?(enter the ID number)", sqlite.plant_db.get_db_column_info('rowid'))
+           event_id=sqlite.plant_db.get_event_id(plant_id)
+           sqlite.plant_db.delete_plant(plant_id)
+           delete_event(event_id, service)
+           delete_plant= menu_selection_validation(str,'Do you want to delete another plant?', ('y', 'Y', 'n', 'N'))
    
-def main_menu():   
+def main_menu(service):   
 
-     menu_selec= input('would you like to \n 1) Add new plant \n 2) View your current plants \n 3) Update your plants \n 4) Delete a plant \n 5) Exit')
+     menu_selec= menu_selection_validation(str,'would you like to \n 1) Add new plant \n 2) View your current plants \n 3) Update your plants \n 4) Delete a plant \n 5) Exit', ('1', '2', '3', '4', '5'))
      if menu_selec=='1':
-         plants.add_plant()
-         main_menu()
+         plants.add_plant(service)
+         main_menu(service)
      if menu_selec=='2':
          sqlite.plant_db.print_plant_data()
-         main_menu()
+         main_menu(service)
      if menu_selec=='3':
-         plants.update_plant()
-         main_menu()
+         plants.update_plant(service)
+         main_menu(service)
      if menu_selec =='4':
-         ##placeholder for delete option
-     if menu_selec== '5'
+         plants.delete_plant(service)
+         main_menu(service)
+     if menu_selec== '5':
          sqlite.plant_db.connection.close()
          print("take care of those plant babies!")
         
@@ -172,24 +195,28 @@ def add_water_day(name, location, last_watered_date, water_days, service):
 
 
     ##### Not being used currently        
-def menu_selection_validation(prompt,allowable_responses):
+def menu_selection_validation(value_type, prompt,allowable_responses):
     while True:
-        response= input(prompt)
         try:
-            if response in allowable_responses:
-                return response
-            else:
-                raise invalid_menu_entry
+            response= value_type(input(prompt))
+            try:
+                if response in allowable_responses:
+                    return response
+                else:
+                    raise invalid_menu_entry
             
-        except invalid_menu_entry:
+            except invalid_menu_entry:
+                print ("Enter a valid manu slection:{}".format(allowable_responses))
+        except:
             print ("Enter a valid manu slection:{}".format(allowable_responses))
+        
             
 
         
 def main():
     
-    
-    main_menu()
+    service=oauth()
+    main_menu(service)
     
     
        

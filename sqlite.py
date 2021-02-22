@@ -59,6 +59,15 @@ class plant_db():
         print("     1.name       2.location        3.last watered on:        4.days between watering")
         for plant in readable_plants:
             print(plant)
+    
+    def get_db_column_info(column):
+        plant_db.open_plant_db()
+        plant_db.cursor.execute("SELECT [%s] FROM plant_data" % (column,),)
+        column_values=plant_db.cursor.fetchall()
+        returnable_values=[]
+        for values in column_values:
+            returnable_values.append(values[0])
+        return returnable_values
             
         
     def update_plant(column, row, change ):
@@ -75,6 +84,11 @@ class plant_db():
         plant_db.cursor.execute ("SELECT event_id FROM plant_data WHERE rowid = ?", (row,) )
         event_id= plant_db.cursor.fetchone()
         return event_id[0]
+    
+    def delete_plant(row):
+        plant_db.open_plant_db()
+        plant_db.cursor.execute("DELETE FROM plant_data WHERE rowid=?", (row,))
+        plant_db.connection.commit()
         
         
         
