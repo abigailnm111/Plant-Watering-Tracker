@@ -31,11 +31,24 @@ class error(Exception):
 class invalid_menu_entry(error):
     """input not a valid menu option """
     pass
-def update_event(event_id,event_info, update_info, service):
-    
+def update_event(event_id, event_info, update_info, service):
     OGevent = service.events().get(calendarId='primary', eventId= event_id).execute()
-    OGevent[event_info]= update_info
+    if event_info == 'recurrence':
+        update_info=['RRULE:FREQ=DAILY;INTERVAL={};COUNT=10'. format (update_info)]
+        OGevent[event_info]= update_info
+    if event_info ==('start', 'end'):
+        update_info= {
+            'date':update_info,
+            'timeZone': 'America/Los_Angeles',
+            },
+        for event in event_info:
+            OGevent[event]= update_info
+    if event_info== 'summary' or event_info == 'location':
+         OGevent[event_info]= update_info
+  
+    
     service.events().update(calendarId='primary', eventId=event_id, body=OGevent).execute()
+   
     print ("you have updated your plant's watering schedule")
     
 def delete_event(event_id,service):
@@ -46,16 +59,16 @@ def delete_event(event_id,service):
         pass
     
 def column_event(column):
-    if column== '1':
+    if column== 1:
         event_info= 'summary'
-    if column == '2':
+    if column == 2:
         event_info= 'location'
         ##work on/test these
-    if column== '3':
+    if column== 3:
         event_info= ('start', 'end')
         
-    if column== '4':
-        event_info=='recurrence'
+    if column== 4:
+        event_info='recurrence'
     return event_info
     
 class plants():
@@ -118,8 +131,8 @@ class plants():
                update_item = exceptions.check_input(exceptions.days_error)
            sqlite.plant_db.update_plant( column,plant_id,update_item)
            event_id=sqlite.plant_db.get_event_id(plant_id)
-           
-           update_event(event_id, column, update_item, service)
+           event_catagory= column_event(column_id)
+           update_event(event_id, event_catagory, update_item, service)
            print ("Your updates have been made to database and calendar")
            update_plant= menu_selection_validation(str,'Do you want to update another plant?', ('y', 'Y', 'n', 'N'))
            
@@ -134,24 +147,25 @@ class plants():
            delete_plant= menu_selection_validation(str,'Do you want to delete another plant?', ('y', 'Y', 'n', 'N'))
    
 def main_menu(service):   
-
-     menu_selec= menu_selection_validation(str,'would you like to \n 1) Add new plant \n 2) View your current plants \n 3) Update your plants \n 4) Delete a plant \n 5) Exit', ('1', '2', '3', '4', '5'))
-     if menu_selec=='1':
-         plants.add_plant(service)
-         main_menu(service)
-     if menu_selec=='2':
-         sqlite.plant_db.print_plant_data()
-         main_menu(service)
-     if menu_selec=='3':
-         plants.update_plant(service)
-         main_menu(service)
-     if menu_selec =='4':
-         plants.delete_plant(service)
-         main_menu(service)
-     if menu_selec== '5':
-         sqlite.plant_db.connection.close()
-         print("take care of those plant babies!")
-        
+    while True:
+         menu_selec= menu_selection_validation(str,'would you like to \n 1) Add new plant \n 2) View your current plants \n 3) Update your plants \n 4) Delete a plant \n 5) Exit', ('1', '2', '3', '4', '5'))
+         if menu_selec=='1':
+             plants.add_plant(service)
+             
+         if menu_selec=='2':
+             sqlite.plant_db.print_plant_data()
+             
+         if menu_selec=='3':
+             plants.update_plant(service)
+             
+         if menu_selec =='4':
+             plants.delete_plant(service)
+             
+         if menu_selec== '5':
+             sqlite.plant_db.connection.close()
+             print("take care of those plant babies!")
+             break
+            
     #Request authorization to add/edit events to user's priamary Google Calendar
 def oauth():
     
