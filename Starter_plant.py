@@ -22,7 +22,7 @@ import exceptions
 
 
 
-
+YN_menu= ['y', 'Y', 'n', 'N']
 
 class error(Exception):
     """base error"""
@@ -33,6 +33,14 @@ class invalid_menu_entry(error):
     pass
 def update_event(event_id, event_info, update_info, service):
     OGevent = service.events().get(calendarId='primary', eventId= event_id).execute()
+    if OGevent['status']== 'cancelled':
+        add_cancelled_event=menu_selection_validation("It looks like this event was deleted. Do you want to re add it to your calendar?", YN_menu)
+        if add_cancelled_event== 'y' or add_cancelled_event =='Y':
+            OGevent['status']= 'confirmed'
+            db_data=sqlite.plant_db.get_plant_column_info('water_frequency', event_id)
+            OGevent['recurrence']= ['RRULE:FREQ=DAILY;INTERVAL={};COUNT=10'. format (db_data)]
+        if add_cancelled_event== 'n' or add_cancelled_event == 'N':
+            return
     if event_info == 'recurrence':
         update_info=['RRULE:FREQ=DAILY;INTERVAL={};COUNT=10'. format (update_info)]
         OGevent[event_info]= update_info
@@ -44,8 +52,9 @@ def update_event(event_id, event_info, update_info, service):
         for event in event_info:
             OGevent[event]= update_info
     if event_info== 'summary' or event_info == 'location':
+         print("before",OGevent)
          OGevent[event_info]= update_info
-  
+         print ("after", OGevent)
     
     service.events().update(calendarId='primary', eventId=event_id, body=OGevent).execute()
    
@@ -63,7 +72,7 @@ def column_event(column):
         event_info= 'summary'
     if column == 2:
         event_info= 'location'
-        ##work on/test these
+        
     if column== 3:
         event_info= ('start', 'end')
         
@@ -208,7 +217,7 @@ def add_water_day(name, location, last_watered_date, water_days, service):
     return plant_added
 
 
-    ##### Not being used currently        
+          
 def menu_selection_validation(value_type, prompt,allowable_responses):
     while True:
         try:
