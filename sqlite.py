@@ -68,7 +68,13 @@ class plant_db():
         for values in column_values:
             returnable_values.append(values[0])
         return returnable_values
-            
+    
+    def get_plant_column_info(column, event_id):
+        plant_db.open_plant_db()
+        plant_db.cursor.execute("SELECT [%s] FROM plant_data WHERE event_id = ?"% (column), (event_id,) )
+        column_info = plant_db.cursor.fetchone()
+        return column_info[0]
+                                
         
     def update_plant(column, row, change ):
         plant_db.open_plant_db()
