@@ -52,9 +52,8 @@ def update_event(event_id, event_info, update_info, service):
         for event in event_info:
             OGevent[event]= update_info
     if event_info== 'summary' or event_info == 'location':
-         print("before",OGevent)
          OGevent[event_info]= update_info
-         print ("after", OGevent)
+         
     
     service.events().update(calendarId='primary', eventId=event_id, body=OGevent).execute()
    
@@ -108,7 +107,7 @@ class plants():
             plant_water_frequency=exceptions.check_input(exceptions.days_error)
             plant_entry= plants(plant_name, plant_location, plant_last_watered, plant_water_frequency)
             plant_entry.plant_dict()
-            add_plant=menu_selection_validation(str, "do you have more plants to add? Y or N",('y', 'Y', 'n', 'N') )
+            add_plant=menu_selection_validation(str, "do you have more plants to add? Y or N",YN_menu)
             if add_plant== "n" or add_plant== "N":
                   
                  #calls account authorization
@@ -143,7 +142,7 @@ class plants():
            event_catagory= column_event(column_id)
            update_event(event_id, event_catagory, update_item, service)
            print ("Your updates have been made to database and calendar")
-           update_plant= menu_selection_validation(str,'Do you want to update another plant?', ('y', 'Y', 'n', 'N'))
+           update_plant= menu_selection_validation(str,'Do you want to update another plant?', YN_menu)
            
     def delete_plant(service):
         delete_plant='y'
@@ -153,7 +152,7 @@ class plants():
            event_id=sqlite.plant_db.get_event_id(plant_id)
            sqlite.plant_db.delete_plant(plant_id)
            delete_event(event_id, service)
-           delete_plant= menu_selection_validation(str,'Do you want to delete another plant?', ('y', 'Y', 'n', 'N'))
+           delete_plant= menu_selection_validation(str,'Do you want to delete another plant?', YN_menu)
    
 def main_menu(service):   
     while True:
@@ -184,8 +183,8 @@ def oauth():
     
     #Use user input to create and add event to Calendar
 def add_water_day(name, location, last_watered_date, water_days, service):
-    #name of even includes plant's name
-    event_summary= ('water {}'. format (name)) 
+    #name of event includes plant's name
+    event_summary= ('Water {}'. format (name)) 
      #takes last day watered and adds the number of days from frequency to determine
      #date for next watering event. Converts to date only and then to string to make JSON compatiable
     
