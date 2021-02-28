@@ -16,13 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from pages.views import home_view, plant_view
-from plants.views import plant_detail_view, plant_create_view
+from pages.views import home_view 
+from plants.views import plant_detail_view, plant_create_view, plant_update_view, plant_list_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view, name='home'),
-    path('plants/', plant_view, name='plants' ),
+    path('plants/', plant_list_view, name='plants' ),
     path ('create/', plant_create_view),
-    path ('detail', plant_detail_view)
+    path ('detail', plant_detail_view),
+    path('update/<int:id>/update/', plant_update_view),
+    path('plant/<int:id>/delete/', plant_detail_view)
 ]

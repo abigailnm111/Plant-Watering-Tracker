@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content%}
 
-{% for instance in plant_list%}
+{% for instance in object_list%}
 	<p>{{instance.name}}-{{instance.location}}</p>
 
 {%endfor%}

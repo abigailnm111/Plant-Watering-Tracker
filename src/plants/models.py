@@ -5,4 +5,4 @@ class plants(models.Model):
 	name= models.CharField(max_length=50)
 	location=models.CharField(max_length=200)
 	frequency=models.PositiveSmallIntegerField()
-	last_watered=models.DateTimeField()
+	last_watered=models.DateField()
