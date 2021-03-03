@@ -10,4 +10,4 @@ class plants(models.Model):
 	last_watered=models.DateField()
 
 	def get_absolute_url(self):
-		return reverse('plants', kwargs={"id": self.id})
+		return reverse('plant-detail', kwargs={"pk": self.pk})
