@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 
 
-from plants.views import    PlantListView, PlantDetailView, PlantCreateView, PlantUpdateView, PlantDeleteView
+from plants.views import    PlantListView,  PlantCreateView, PlantUpdateView, PlantDeleteView
 
 
 urlpatterns = [
@@ -14,6 +14,5 @@ urlpatterns = [
     path('<int:pk>/delete/', PlantDeleteView.as_view(), name= 'delete-plant'),
     
 	path('', PlantListView.as_view(), name= 'plants'),
-	path('<int:pk>/', PlantDetailView.as_view(), name= 'plant-detail'),
 	path('create/', PlantCreateView.as_view(), name= 'create-plant' )
 	]

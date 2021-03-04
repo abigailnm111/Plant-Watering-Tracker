@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 {% block content%}
-
+<h1> Click on your plants name to view their information or update</h1>
 {% for instance in object_list%}
-	<p>{{instance.name}}-<a href= '{{ instance.get_absolute_url }}'>{{instance.location}}</p>
+	<ul> <a href= '{{ instance.get_absolute_url }}'>{{instance.name}} </a>{{instance.location}}</p>
+		<form action= '.' method='POST'> {% csrf_token %} <a href='{{ instance.get_delete }}'>Delete </a>
+
+	</ul>
+	</form>
 
 {%endfor%}
 {% endblock%}
