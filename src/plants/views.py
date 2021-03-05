@@ -11,6 +11,7 @@ from django.views.generic import (
 from .forms import PlantForm
 from .models import plants
 # Create your views here.
+import Starter_plant
 
 def get_success_url():
 		return reverse('plants')
@@ -25,6 +26,7 @@ class PlantCreateView(CreateView):
 	template_name= 'plants/plants_create.html'
 	form_class= PlantForm
 	queryset= plants.objects.all()
+	Starter_plant.oauth()
 	def form_valid(self, form):
 		print(form.cleaned_data)
 

@@ -10,7 +10,8 @@ Created on Mon Jan 18 21:02:33 2021
 from googleapiclient import errors
 from googleapiclient.discovery import build
 import google.oauth2.credentials
-from google_auth_oauthlib.flow 
+import google_auth_oauthlib.flow
+
 
 """other libraries"""
 from datetime import datetime, timedelta
@@ -19,8 +20,6 @@ import json
 import oauth_json
 
 
-
-YN_menu= ['y', 'Y', 'n', 'N']
 
 
 def update_event(event_id, event_info, update_info, service):
@@ -67,10 +66,11 @@ def oauth():
     flow= google_auth_oauthlib.flow.Flow.from_client_secrets_file(oauth_json.client_secret, scopes= ['https://www.googleapis.com/auth/calendar'])
     flow.redirect_uri= 'http://127.0.0.1:8000/plants/'
     authorization_url, state= flow.authorization_url(
-        access_type='offline',
+        access_type='online',
         include_granted_scopes='true'
         )
-    return build('calendar', 'v3', credentials=creds)
+    credentials = google.oauth2.credentials.Credentials()
+    return build('calendar', 'v3', credentials=credentials)
     
     #Use user input to create and add event to Calendar
 def add_water_day(name, location, last_watered_date, water_days, service):
@@ -78,7 +78,7 @@ def add_water_day(name, location, last_watered_date, water_days, service):
     event_summary= ('Water {}'. format (name)) 
      #takes last day watered and adds the number of days from frequency to determine
      #date for next watering event. Converts to date only and then to string to make JSON compatiable
-    last_watered_date= 
+ 
     plant_last_watered= datetime.strptime(last_watered_date,'%Y-%m-%d').strftime('%m/%d/%Y')
     water_date=str(datetime.date(plant_last_watered+timedelta(days= water_days)))  
     #creates reoccuring events based on number of days between watering
@@ -107,17 +107,7 @@ def add_water_day(name, location, last_watered_date, water_days, service):
     return plant_added
 
 
-          
 
-            
 
-        
-
-    
-    
-       
-  
-
-main()
 
 
