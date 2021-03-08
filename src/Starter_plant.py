@@ -7,17 +7,14 @@ Created on Mon Jan 18 21:02:33 2021
 
 """
 #setting up OAuth2
-from googleapiclient import errors
-from googleapiclient.discovery import build
-import google.oauth2.credentials
-import google_auth_oauthlib.flow
+
 
 
 """other libraries"""
 from datetime import datetime, timedelta
 import json
 
-import oauth_json
+
 
 
 
@@ -61,16 +58,19 @@ def delete_event(event_id,service):
     
 
     #Request authorization to add/edit events to user's priamary Google Calendar
-def oauth():
+# def oauth():
     
-    flow= google_auth_oauthlib.flow.Flow.from_client_secrets_file(oauth_json.client_secret, scopes= ['https://www.googleapis.com/auth/calendar'])
-    flow.redirect_uri= 'http://127.0.0.1:8000/plants/'
-    authorization_url, state= flow.authorization_url(
-        access_type='online',
-        include_granted_scopes='true'
-        )
-    credentials = google.oauth2.credentials.Credentials()
-    return build('calendar', 'v3', credentials=credentials)
+#     flow= google_auth_oauthlib.flow.Flow.from_client_secrets_file(oauth_json.client_secret, scopes= ['https://www.googleapis.com/auth/calendar'])
+#     flow.redirect_uri= 'http://127.0.0.1:8000/plants/'
+#     authorization_uri= flow.authorization_url(
+#         #access_type='online',
+#         #include_granted_scopes='true'
+#         )
+#     credentials = google.oauth2.credentials.Credentials(flow)
+#     service= build('calendar', 'v3', credentials=credentials)
+#     test_print= service.calendars().get(calendarId='primary').execute()
+#     print(test_print['summary'])
+    #return build('calendar', 'v3', credentials=credentials)
     
     #Use user input to create and add event to Calendar
 def add_water_day(name, location, last_watered_date, water_days, service):
@@ -105,6 +105,8 @@ def add_water_day(name, location, last_watered_date, water_days, service):
     plant_added= service.events().insert(calendarId='primary', body=json_wd).execute()
    
     return plant_added
+
+
 
 
 
