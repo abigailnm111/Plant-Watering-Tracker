@@ -29,22 +29,35 @@ class PlantListView(ListView):
 
 
 
-class PlantCreateView(CreateView):
-	template_name= 'plants/plants_create.html'
-	form_class= PlantForm
-	queryset= plants.objects.all()
-	# token = SocialToken.objects.get(account__user=request.user, account__provider='google')
-	# credentials = Credentials(
-	# 	token=token.token,
-	# 	refresh_token=token.token_secret,
-	# 	token_uri='https://oauth2.googleapis.com/token',
-	# 	client_id='799544582104-gbpau73rvg05q41feqi11kc1t6odkkqb.apps.googleusercontent.com', 
-	# 	client_secret='oauth_jason.client_secret'
-	# 	) 
-	# service = build('calendar', 'v3', credentials=credentials)
+# class PlantCreateView(CreateView):
+# 	template_name= 'plants/plants_create.html'
+# 	form_class= PlantForm
+# 	queryset= plants.objects.all()
 
-	def get_success_url(self):
-		return reverse('plants')
+def plant_create_view(request):
+	form=PlantForm(request.POST or None)
+	if form.is_valid():
+		form.save()
+		form= PlantForm()
+	context = {
+	'form':form
+	}
+	token = SocialToken.objects.get(account__user=request.user, account__provider='google')
+	credentials = Credentials(
+		token=token.token,
+		refresh_token=token.token_secret,
+		token_uri='https://oauth2.googleapis.com/token',
+		client_id='799544582104-gbpau73rvg05q41feqi11kc1t6odkkqb.apps.googleusercontent.com', 
+		client_secret='oauth_jason.client_secret'
+		) 
+	service = build('calendar', 'v3', credentials=credentials)
+	#NEED TO ADD SCOPES
+	test= service.calendars().get(calendarId='primary').execute()
+	print(test)
+	return render (request, "plants/plants_create.html",context)
+	
+
+	
 
 
 class PlantUpdateView(UpdateView):
