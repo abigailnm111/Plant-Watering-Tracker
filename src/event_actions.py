@@ -57,29 +57,17 @@ def delete_event(event_id,service):
 
     
 
-    #Request authorization to add/edit events to user's priamary Google Calendar
-# def oauth():
     
-#     flow= google_auth_oauthlib.flow.Flow.from_client_secrets_file(oauth_json.client_secret, scopes= ['https://www.googleapis.com/auth/calendar'])
-#     flow.redirect_uri= 'http://127.0.0.1:8000/plants/'
-#     authorization_uri= flow.authorization_url(
-#         #access_type='online',
-#         #include_granted_scopes='true'
-#         )
-#     credentials = google.oauth2.credentials.Credentials(flow)
-#     service= build('calendar', 'v3', credentials=credentials)
-#     test_print= service.calendars().get(calendarId='primary').execute()
-#     print(test_print['summary'])
-    #return build('calendar', 'v3', credentials=credentials)
     
     #Use user input to create and add event to Calendar
-def add_water_day(name, location, last_watered_date, water_days, service):
+def create_event(name, location, last_watered_date, water_days, service):
     #name of event includes plant's name
     event_summary= ('Water {}'. format (name)) 
      #takes last day watered and adds the number of days from frequency to determine
      #date for next watering event. Converts to date only and then to string to make JSON compatiable
- 
-    plant_last_watered= datetime.strptime(last_watered_date,'%Y-%m-%d').strftime('%m/%d/%Y')
+    
+    
+    plant_last_watered= datetime.strptime(str(last_watered_date),'%Y-%m-%d')
     water_date=str(datetime.date(plant_last_watered+timedelta(days= water_days)))  
     #creates reoccuring events based on number of days between watering
     frequency='RRULE:FREQ=DAILY;INTERVAL={};COUNT=10'. format (water_days)

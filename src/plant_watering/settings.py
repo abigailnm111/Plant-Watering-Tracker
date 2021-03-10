@@ -140,6 +140,8 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE':[
         'profile',
         'email',
+        'openid',
+        'https://www.googleapis.com/auth/calendar',
         ],
         'AUTH_PARAMS': {
         'access_type': 'offline',

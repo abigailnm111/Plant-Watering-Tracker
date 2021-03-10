@@ -8,7 +8,7 @@ class plants(models.Model):
 	location=models.CharField(max_length=200)
 	frequency=models.PositiveSmallIntegerField()
 	last_watered=models.DateField()
-	#event_id = models.CharField(max_length= 50)
+	event_id = models.CharField(max_length= 50, blank=True)
 
 	def get_absolute_url(self):
 		return reverse('update-plant', kwargs={"pk": self.pk})
