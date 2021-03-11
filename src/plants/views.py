@@ -58,18 +58,23 @@ def plant_create_view(request):
 	return render (request, "plants/plants_create.html",context)
 	
 
-def plant_update_view(request, id):
+def plant_update_view(request, pk):
 	service=get_token(request)
-	obj= plants.objects.get(id=id)
-	form=PlantForm(request.POST or none, instance=obj)
+	obj= plants.objects.get(pk=pk)
+	form=PlantForm(request.POST or None, instance=obj)
 	if form.is_valid():
 		form.save()
-		#figure out how to get fields changed (event_info) and updated info 
-		#update_event(form.cleaned_data['event_id'], event_info, update_info, service)
+		if form.has_changed()== True:
+			updates_made= []
+			for update in form.changed_data:
+				updates_made.append(form.cleaned_data[update])
+		event_id= getattr(obj, 'event_id')
+		
+		event_actions.update_event(event_id, form.changed_data, updates_made, service)
 	context= {
 	'form': form
 	}
-	return render(request, "plants/plant_update.html", context)
+	return render(request, "plants/plants_create.html", context)
 
 
 def plant_delete_view(request, id):

@@ -21,28 +21,38 @@ import json
 
 def update_event(event_id, event_info, update_info, service):
     OGevent = service.events().get(calendarId='primary', eventId= event_id).execute()
-    if OGevent['status']== 'cancelled':
-        add_cancelled_event=menu_selection_validation("It looks like this event was deleted. Do you want to re add it to your calendar?", YN_menu)
-        if add_cancelled_event== 'y' or add_cancelled_event =='Y':
-            OGevent['status']= 'confirmed'
-            db_data=sqlite.plant_db.get_plant_column_info('water_frequency', event_id)
-            OGevent['recurrence']= ['RRULE:FREQ=DAILY;INTERVAL={};COUNT=10'. format (db_data)]
-        if add_cancelled_event== 'n' or add_cancelled_event == 'N':
-            return
-    if event_info == 'recurrence':
-        update_info=['RRULE:FREQ=DAILY;INTERVAL={};COUNT=10'. format (update_info)]
-        OGevent[event_info]= update_info
-    if event_info ==('start', 'end'):
-        update_info= {
-            'date':update_info,
-            'timeZone': 'America/Los_Angeles',
-            },
-        for event in event_info:
-            OGevent[event]= update_info
-    if event_info== 'summary' or event_info == 'location':
-         OGevent[event_info]= update_info
-         
-    
+    # if OGevent['status']== 'cancelled':
+    #     add_cancelled_event=menu_selection_validation("It looks like this event was deleted. Do you want to re add it to your calendar?", YN_menu)
+    #     if add_cancelled_event== 'y' or add_cancelled_event =='Y':
+    #         OGevent['status']= 'confirmed'
+    #         db_data=sqlite.plant_db.get_plant_column_info('water_frequency', event_id)
+    #         OGevent['recurrence']= ['RRULE:FREQ=DAILY;INTERVAL={};COUNT=10'. format (db_data)]
+    #     if add_cancelled_event== 'n' or add_cancelled_event == 'N':
+    #         return
+    for field in event_info:
+        i= event_info.index(field)
+        print(i, update_info[i], update_info)
+        if field == 'frequency':
+            update_info=['RRULE:FREQ=DAILY;INTERVAL={};COUNT=10'. format(update_info[i])]
+            OGevent['recurrence']= update_info
+        if field ==('last_watered'):
+            ##Datetime from form not working with format
+            update_info= str(datetime.date(datetime.strptime(str(update_info[0]),'%Y-%m-%d')))
+            update_info= {
+                'date':update_info,
+                'timeZone': 'America/Los_Angeles',
+                },
+            OGevent['start']= update_info
+            OGevent['end']= update_info
+        if field== 'name':
+
+            OGevent['summary']= update_info[i]
+
+        if field == 'location':
+             OGevent['location']= update_info[i]
+    OGevent= json.dumps(OGevent,default=lambda o:o.__dict__)     
+    OGevent=json.loads(OGevent)
+    print (OGevent)
     service.events().update(calendarId='primary', eventId=event_id, body=OGevent).execute()
    
     print ("you have updated your plant's watering schedule")
