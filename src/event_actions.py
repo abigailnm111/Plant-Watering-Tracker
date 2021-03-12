@@ -8,16 +8,11 @@ Created on Mon Jan 18 21:02:33 2021
 """
 #setting up OAuth2
 
-
+from googleapiclient import errors
 
 """other libraries"""
 from datetime import datetime, timedelta
 import json
-
-
-
-
-
 
 def update_event(event_id, event_info, update_info, service):
     OGevent = service.events().get(calendarId='primary', eventId= event_id).execute()

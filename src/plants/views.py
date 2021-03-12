@@ -77,16 +77,17 @@ def plant_update_view(request, pk):
 	return render(request, "plants/plants_create.html", context)
 
 
-def plant_delete_view(request, id):
+def plant_delete_view(request, pk):
 	service=get_token(request)
-	obj= get_object_or_404(plants, id=id)
+	obj= get_object_or_404(plants, pk=pk)
 	if request.method== 'POST':
 		obj.delete()
-
+		event_id= getattr(obj, 'event_id')
+		event_actions.delete_event(event_id, service)
 	context= {
 		"object":obj
 	}
-	return render(request,'plants/plant_delete_view.html', context)
+	return render(request,'plants/plants_delete.html', context)
 
 # class PlantUpdateView(UpdateView):
 # 	template_name= 'plants/plants_create.html'
