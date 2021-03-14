@@ -1,7 +1,10 @@
+{% extends "base.html" %}
+{% block content%}
 {% load socialaccount %}
-<html>
-<body>
+
 <h1> Keep track of your plants using your Google Login and Calendar</h1>
+
+
 {% if user.is_authenticated%}
 <p> You are logged in as {{user.username}}</p>
 {% else %}
@@ -9,5 +12,4 @@
 {% endif %}
 
 
-</body>
-</html>
+{% endblock%}

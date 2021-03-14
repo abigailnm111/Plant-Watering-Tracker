@@ -1,11 +1,13 @@
 from django.urls import reverse
 from django.http import Http404
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import (
 	
 	ListView,
 	
 	)
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin	
 
 from .forms import PlantForm
 from .models import plants
@@ -31,9 +33,10 @@ def get_token(request):
 	return build('calendar', 'v3', credentials=credentials)
 
 
-class PlantListView(ListView):
+class PlantListView(LoginRequiredMixin,ListView):
 	template_name= 'plants/plants_list.html'
-	queryset = plants.objects.all()
+	def get_queryset(self):
+		return plants.objects.filter(user=self.request.user)
 
 
 
@@ -42,22 +45,26 @@ class PlantListView(ListView):
 # 	form_class= PlantForm
 # 	queryset= plants.objects.all()
 
+@login_required
 def plant_create_view(request):
 	
 	service=get_token(request)
 	form=PlantForm(request.POST or None)
 	if form.is_valid():
-		new_plant=form.save()
+
+		new_plant=form.save(commit=False)
+		new_plant.user= request.user
 		event=event_actions.create_event(form.cleaned_data['name'], form.cleaned_data['location'], form.cleaned_data['last_watered'], form.cleaned_data['frequency'],service)
 		new_plant.event_id= event['id']
 		new_plant=form.save()
 		form= PlantForm()
+		return redirect('plants')
 	context = {
 	'form':form
 	}
 	return render (request, "plants/plants_create.html",context)
 	
-
+@login_required
 def plant_update_view(request, pk):
 	service=get_token(request)
 	obj= plants.objects.get(pk=pk)
@@ -71,12 +78,13 @@ def plant_update_view(request, pk):
 		event_id= getattr(obj, 'event_id')
 		
 		event_actions.update_event(event_id, form.changed_data, updates_made, service)
+		return redirect('plants')
 	context= {
 	'form': form
 	}
 	return render(request, "plants/plants_create.html", context)
 
-
+@login_required
 def plant_delete_view(request, pk):
 	service=get_token(request)
 	obj= get_object_or_404(plants, pk=pk)
@@ -84,6 +92,7 @@ def plant_delete_view(request, pk):
 		obj.delete()
 		event_id= getattr(obj, 'event_id')
 		event_actions.delete_event(event_id, service)
+		return redirect('plants')
 	context= {
 		"object":obj
 	}

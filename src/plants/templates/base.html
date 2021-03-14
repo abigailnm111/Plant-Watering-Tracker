@@ -2,10 +2,46 @@
 <html>
 <head>
 	<title>Plant Tracking Calendar </title>
+	<style>
+		body{
+			font-family: Lora, serif;
+		}
+		table{
+			width: 40%;
+			margin-right: auto;
+			margin-left: auto;
+			border-collapse: collapse;
+
+		}
+		tr:nth-child(even) {background-color: #6B8E2350;}
+		td{
+			vertical-align: middle;
+			padding: 25px 50px 25px;
+		}
+		th{
+			
+			background-color: #6B8E23;
+			color: white;
+		}
+        	
+       	h1{
+       		text-align:center;
+       		font-family: Ubuntu, sans-serif;
+       	}
+		.logout{
+			background-color: #e7e7e7;
+			position:relative;
+			left: 1200px;
+		}
+	</style>
 </head>
 <body>
-{% block content%}
-{%endblock%}
+<a href='{% url "plants" %}'>See all my plants </a>
+<button class= "button logout"><a href='{% url "account_logout" %}'>Logout </a></button>
+{% block content %}
+{% endblock %}
+
+
 
 </body>
 
