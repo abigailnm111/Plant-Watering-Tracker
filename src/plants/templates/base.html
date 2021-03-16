@@ -1,8 +1,8 @@
-<idoctype html>
+<!doctype html>
 <html>
 <head>
 	<title>Plant Tracking Calendar </title>
-	<style>
+	<!-- <style>
 		body{
 			font-family: Lora, serif;
 		}
@@ -33,17 +33,22 @@
 			position:relative;
 			left: 1200px;
 		}
-	</style>
+	</style> -->
 </head>
+
 <body>
 <a href='{% url "plants" %}'>See all my plants </a>
+<div class= user>
+<p> You are logged in as {{user.username}}</p>
 <button class= "button logout"><a href='{% url "account_logout" %}'>Logout </a></button>
+</div>
 {% block content %}
 {% endblock %}
 
 
 
 </body>
-
+{% load static %}
+<link rel= "stylesheet" type= "text/css" href="{% static 'plants/style.css' %}">
 
 </html>
