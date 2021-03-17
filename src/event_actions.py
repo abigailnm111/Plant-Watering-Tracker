@@ -26,7 +26,7 @@ def update_event(event_id, event_info, update_info, service):
     #         return
     for field in event_info:
         i= event_info.index(field)
-        print(i, update_info[i], update_info)
+        
         if field == 'frequency':
             update_info=['RRULE:FREQ=DAILY;INTERVAL={};COUNT=10'. format(update_info[i])]
             OGevent['recurrence']= update_info
@@ -47,7 +47,7 @@ def update_event(event_id, event_info, update_info, service):
              OGevent['location']= update_info[i]
     OGevent= json.dumps(OGevent,default=lambda o:o.__dict__)     
     OGevent=json.loads(OGevent)
-    print (OGevent)
+    
     service.events().update(calendarId='primary', eventId=event_id, body=OGevent).execute()
    
     print ("you have updated your plant's watering schedule")

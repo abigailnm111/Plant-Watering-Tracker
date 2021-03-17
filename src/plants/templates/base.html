@@ -38,9 +38,9 @@
 
 <body>
 <a href='{% url "plants" %}'>See all my plants </a>
-<div class= user>
+<div class= "user">
 <p> You are logged in as {{user.username}}</p>
-<button class= "button logout"><a href='{% url "account_logout" %}'>Logout </a></button>
+<button class= logout><a href='{% url "account_logout" %}'>Logout </a></button>
 </div>
 {% block content %}
 {% endblock %}

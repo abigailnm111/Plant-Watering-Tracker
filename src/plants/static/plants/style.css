@@ -3,6 +3,8 @@ body{
 	background: green url("images/pexels-content-pixie-3554239.jpg");
 	background-size: cover;
 }
+
+
 table{
 	width: 40%;
 	margin-right: auto;
@@ -23,10 +25,10 @@ th{
 	color: white;
 }
 	
-	h1{
-		text-align:center;
-		font-family: Ubuntu, sans-serif;
-	}
+h1{
+	text-align:center;
+	font-family: Ubuntu, sans-serif;
+}
 
 }
 .logout{
@@ -38,3 +40,11 @@ th{
 	float:right;
 }
 
+.login {
+	font-size: 16px;
+	border:none;
+	color:black;
+	padding: 15px 32px;
+	text-align: center;
+
+}
