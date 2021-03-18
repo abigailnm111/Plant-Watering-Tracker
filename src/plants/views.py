@@ -1,5 +1,6 @@
 from django.urls import reverse
 from django.http import Http404
+from django import forms
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import (
 	
@@ -65,25 +66,25 @@ def plant_create_view(request):
 	}
 	return render (request, "plants/plants_create.html",context)
 	
-# @login_required
-# def plant_update_view(request, pk):
-# 	service=get_token(request)
-# 	obj= plants.objects.get(pk=pk)
-# 	form=PlantForm(request.POST or None, instance=obj)
-# 	if form.is_valid():
-# 		form.save()
-# 		if form.has_changed()== True:
-# 			updates_made= []
-# 			for update in form.changed_data:
-# 				updates_made.append(form.cleaned_data[update])
-# 		event_id= getattr(obj, 'event_id')
+@login_required
+def plant_update_view(request, pk):
+	service=get_token(request)
+	obj= plants.objects.get(pk=pk)
+	form=PlantForm(request.POST or None, instance=obj)
+	if form.is_valid():
+		form.save()
+		if form.has_changed()== True:
+			updates_made= []
+			for update in form.changed_data:
+				updates_made.append(form.cleaned_data[update])
+			event_id= getattr(obj, 'event_id')
 		
-# 		event_actions.update_event(event_id, form.changed_data, updates_made, service)
-# 		return redirect('plants')
-# 	context= {
-# 	'form': form
-# 	}
-# 	return render(request, "plants/plants_create.html", context)
+			event_actions.update_event(event_id, form.changed_data, updates_made, service)
+		return redirect('plants')
+	context= {
+	'form': form
+	}
+	return render(request, "plants/plants_create.html", context)
 
 @login_required
 def plant_delete_view(request, pk):
@@ -99,25 +100,26 @@ def plant_delete_view(request, pk):
 	}
 	return render(request,'plants/plants_delete.html', context)
 
-class PlantUpdateView(UpdateView):
-	template_name= 'plants/plants_create.html'
-	form_class= PlantForm
-	queryset= plants.objects.all()
-	#event_actions.update_event(event_id, form.changed_data, updates_made, service)
+# class PlantUpdateView(UpdateView):
+# 	template_name= 'plants/plants_create.html'
+# 	form_class= PlantForm
+# 	queryset= plants.objects.all()
 	
-	def get_success_url(self):
-		return reverse('plants')
+# 	event_actions.update_event(event_id, form.changed_data, updates_made, service)
+	
+	# def get_success_url(self):
+	# 	return reverse('plants')
 
-	def get_token(self):
-		token = SocialToken.objects.get(account__user=self.request.user, account__provider='google')
-		credentials = Credentials(
-			token=token.token,
-			refresh_token=token.token_secret,
-			token_uri='https://oauth2.googleapis.com/token',
-			client_id='799544582104-gbpau73rvg05q41feqi11kc1t6odkkqb.apps.googleusercontent.com', 
-			client_secret=''
-			) 
-		return build('calendar', 'v3', credentials=credentials)
+	# def get_token(self):
+	# 	token = SocialToken.objects.get(account__user=self.request.user, account__provider='google')
+	# 	credentials = Credentials(
+	# 		token=token.token,
+	# 		refresh_token=token.token_secret,
+	# 		token_uri='https://oauth2.googleapis.com/token',
+	# 		client_id='799544582104-gbpau73rvg05q41feqi11kc1t6odkkqb.apps.googleusercontent.com', 
+	# 		client_secret=''
+	# 		) 
+	# 	return build('calendar', 'v3', credentials=credentials)
 
 # class PlantDeleteView(DeleteView):
 # 	template_name= 'plants/plants_delete.html'
