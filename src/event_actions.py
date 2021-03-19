@@ -23,7 +23,7 @@ def update_event(event_id, event_info, update_info, service):
         i= event_info.index(field)
         
         if field == 'frequency':
-            update_info[i]=['RRULE:FREQ=DAILY;INTERVAL={};COUNT=10'.format(update_info[i])]
+            update_info[i]=['RRULE:FREQ=DAILY;INTERVAL={}'.format(update_info[i])]
             OGevent['recurrence']= update_info[i]
         if field ==('last_watered'):
             ##Datetime from form not working with format
@@ -70,7 +70,7 @@ def create_event(name, location, last_watered_date, water_days, service):
     plant_last_watered= datetime.strptime(str(last_watered_date),'%Y-%m-%d')
     water_date=str(datetime.date(plant_last_watered+timedelta(days= water_days)))  
     #creates reoccuring events based on number of days between watering
-    frequency='RRULE:FREQ=DAILY;INTERVAL={};COUNT=10'. format (water_days)
+    frequency='RRULE:FREQ=DAILY;INTERVAL={}'. format (water_days)
     #event information for API calendar
     water_day={
         'summary': event_summary,
