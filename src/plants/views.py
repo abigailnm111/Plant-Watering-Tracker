@@ -27,8 +27,6 @@ def get_token(request):
 	token = SocialToken.objects.get(account__user=request.user, account__provider='google')
 	credentials = Credentials(
 		token=token.token,
-		refresh_token=token.token_secret,
-		token_uri='https://oauth2.googleapis.com/token',
 		client_id='799544582104-gbpau73rvg05q41feqi11kc1t6odkkqb.apps.googleusercontent.com', 
 		client_secret=''
 		) 
