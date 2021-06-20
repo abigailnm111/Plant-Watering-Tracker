@@ -28,7 +28,7 @@ def get_token(request):
 	credentials = Credentials(
 		token=token.token,
 		client_id='799544582104-gbpau73rvg05q41feqi11kc1t6odkkqb.apps.googleusercontent.com', 
-		client_secret=''
+		client_secret='kAaTfRtlp5PzASxL98MMPV2M'
 		) 
 	return build('calendar', 'v3', credentials=credentials)
 

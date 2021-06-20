@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content%}
+{% load socialaccount %}
+
+
+
+
+{% if user.is_authenticated%}
+<a class= 'add' href='{% url "create-plant" %}''>Add a plant</a>
+
+{% else %}
+<div class=tagline>
+<h1> Never forget to water your leafy friends again!</h1>
+<p > or at least not as often...</p>
+
+<button class="login"><a href= "{% provider_login_url 'google' %}"> Login With Google</a></button>
+</div>
+{% endif %}
+
+
+
+{% endblock%}

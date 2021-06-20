@@ -1,0 +1,101 @@
+html{
+    background: green url("images/pexels-content-pixie-3554239.jpg") no-repeat center center fixed;
+	background-size: cover;
+	
+}
+body{
+	font-family: Lora, sans-serif;
+	
+}
+
+
+table{
+	width:40%;
+	border-collapse: collapse;
+	position:fixed;
+	top:20%;
+	left:30%
+	
+
+}
+form{	
+	position:fixed;
+	top:36%;
+	left:36%;
+}
+
+tr:nth-child(even) {background-color: #6B8E2350;}
+td{
+	vertical-align: middle;
+	padding: 25px 50px 25px;
+
+}
+th{
+	
+	background-color: #6B8E23;
+	color: white;
+}
+	
+h1{
+	text-align:center;
+	font-family: Ubuntu, sans-serif;
+}
+
+h2.table{
+	position:absolute;
+	top:10%;
+	left:30%;
+
+}
+
+h2.form{
+	position:absolute;
+	top:30%;
+	left:45%;
+
+}
+}
+.table{
+	width: 100%;
+	
+}
+
+.logout{
+	background-color: #e7e7e7;
+	
+}
+
+.user{
+	float:right;
+}
+
+.login {
+	
+	font-size: 16px;
+	border:none;
+	color:black;
+	padding: 15px 32px;
+	
+
+}
+
+.tagline{
+	position:fixed;
+	top:46%;
+	left:30%;
+	text-align: center;
+
+}
+
+.add{
+
+	font-size: 16px;
+	border:none;
+	color:black;
+	padding: 15px 32px;
+	position:fixed;
+	left: 45%;
+	top:16%;
+
+}
+

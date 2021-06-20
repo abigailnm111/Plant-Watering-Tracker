@@ -1,6 +1,10 @@
 <!doctype html>
 <html>
+{% load static %}
+<link rel='stylesheet' type= "text/css" href="{% static 'plantstatic/style.css' %}"> 
 <head>
+	
+	
 	<title>Plant Tracking Calendar </title>
 	<!-- <style>
 		body{
@@ -35,20 +39,24 @@
 		}
 	</style> -->
 </head>
+<header>
+<h1> Keep track of your plants using your Google Login and Calendar</h1>
 
-<body>
+{% if user.is_authenticated%}
 <a href='{% url "plants" %}'>See all my plants </a>
 <div class= "user">
 <p> You are logged in as {{user.username}}</p>
 <button class= logout><a href='{% url "account_logout" %}'>Logout </a></button>
 </div>
+
+{% endif %}
+</header>
 {% block content %}
 {% endblock %}
 
 
 
-</body>
-{% load static %}
-<link rel= "stylesheet" type= "text/css" href="{% static 'plants/style.css' %}">
+
+
 
 </html>

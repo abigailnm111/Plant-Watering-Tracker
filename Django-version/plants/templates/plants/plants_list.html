@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content%}
-<h1> Click on your plants name to view their information or update</h1>
-<a href='{% url "create-plant" %}'>Add a plant</a>
+<div class= table>
+<h2 class=table> Click on your plants name to view their information or update</h2>
+<a class= add href='{% url "create-plant" %}'>Add a plant</a>
 	<table> 
 		<tr>
 			<th> Plant's Name</th>
@@ -16,5 +17,5 @@
 			</tr>
 		{%endfor%}
 	</table>
-
+</div>
 {% endblock%}
