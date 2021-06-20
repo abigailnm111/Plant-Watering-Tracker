@@ -7,3 +7,4 @@ Never forget to water your plant again!
 
 Fun Feature to add:
 Random name generator
+Live Django Website: https://saveyourplants.net/
